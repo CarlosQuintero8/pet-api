@@ -112,5 +112,3 @@ Carlos Quintero
 ---
 
 ⭐ ¡No olvides dejar una estrella si te ha sido útil! ⭐
-
-        Too many current requests. Your queue position is 2. Please wait for a while or switch to other models for a smoother experience.
