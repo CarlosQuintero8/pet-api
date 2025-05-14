@@ -7,7 +7,6 @@ export class UpdatePetService {
     try {
       const petPost = await this.finderPetService.executeByFindOne(id);
 
-      // Validación más robusta para cada campo
       if (typeof data.pet_name === 'string' && data.pet_name.trim() !== '') {
         petPost.pet_name = data.pet_name.trim().toLowerCase();
       }

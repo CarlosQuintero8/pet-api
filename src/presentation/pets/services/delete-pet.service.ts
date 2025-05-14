@@ -7,9 +7,8 @@ export class DeletePetService {
   async execute(id: string) {
     const petPost = await this.finderPetService.executeByFindOne(id);
 
-    // En lugar de cambiar status a false, podemos marcarlo como eliminado de otra manera
-    // ya que status es un enum en PetPost
-    petPost.hasFound = true; // Marcamos como encontrado para que no aparezca en listados
+    
+    petPost.hasFound = true; 
 
     try {
       await petPost.save();
