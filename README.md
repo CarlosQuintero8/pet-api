@@ -1,114 +1,58 @@
-# 🐾 API de Mascotas Perdidas
-
+# 🐾 Pet API
 ## 📋 Descripción
-API RESTful para gestionar publicaciones de mascotas perdidas. Permite a los usuarios registrarse, crear publicaciones sobre sus mascotas perdidas, y a los administradores aprobar o rechazar estas publicaciones.
+Pet API es un servicio RESTful desarrollado con Node.js y TypeScript que permite gestionar publicaciones de mascotas perdidas. La aplicación proporciona funcionalidades para usuarios normales y administradores, incluyendo registro de usuarios, autenticación, verificación de correo electrónico y gestión completa de publicaciones de mascotas.
 
-## 🚀 Características
-- ✅ Gestión completa de publicaciones de mascotas (CRUD)
-- 👤 Sistema de usuarios con registro y autenticación
-- 🔍 Búsqueda de mascotas por ID
-- 👮 Flujo de aprobación/rechazo de publicaciones
-- 🔒 Arquitectura orientada a servicios
-
+## ✨ Características
+### 👤 Gestión de Usuarios
+- 📝 Registro de usuarios
+- ✉️ Verificación de correo electrónico
+- 🔐 Autenticación con JWT
+- 👑 Roles de usuario (normal y administrador)
+### 🐶 Gestión de Mascotas
+- 📌 Crear publicaciones de mascotas perdidas
+- 🔍 Buscar todas las publicaciones o una específica
+- ✏️ Actualizar información de mascotas (solo admin)
+- ❌ Eliminar publicaciones (solo admin)
+- ✅ Aprobar publicaciones (solo admin)
+- ❎ Rechazar publicaciones (solo admin)
 ## 🛠️ Tecnologías
-- [Node.js](https://nodejs.org/)
-- [Express](https://expressjs.com/)
-- [TypeScript](https://www.typescriptlang.org/)
-- [PostgreSQL](https://www.postgresql.org/)
-- [TypeORM](https://typeorm.io/)
+- Node.js : Entorno de ejecución
+- TypeScript : Lenguaje de programación
+- Express : Framework web
+- TypeORM : ORM para base de datos
+- PostgreSQL : Base de datos relacional
+- JWT : Autenticación basada en tokens
+- Bcrypt : Encriptación de contraseñas
+- Nodemailer : Envío de correos electrónicos
+- Class Validator : Validación de datos
+- Class Transformer : Transformación de objetos
+## 🏗️ Arquitectura
+El proyecto sigue una arquitectura en capas:
 
-## 📦 Instalación
-
-1. Clonar el repositorio:
-```bash
-git clone https://github.com/CarlosQuintero8/pet-api.git
-cd pet-api
-```
-
-2. Instalar dependencias:
-```bash
-npm install
-```
-
-3. Configurar variables de entorno:
-Crea un archivo `.env` en la raíz del proyecto con las siguientes variables:
-```
-PORT=3000
-NODE_ENV=development
-DATABASE_USERNAME=tu_usuario
-DATABASE_PASSWORD=tu_contraseña
-DATABASE_HOST=localhost
-DATABASE_PORT=5432
-DATABASE_NAME=pet_api_db
-```
-
-4. Iniciar la aplicación en modo desarrollo:
-```bash
-npm run dev
-```
-
-## 🏗️ Estructura del Proyecto
-
-```
-src/
-├── app.ts                  # Punto de entrada de la aplicación
-├── config/                 # Configuración de la aplicación
-├── data/                   # Capa de datos y modelos
-│   └── postgres/
-│       └── models/
-│           ├── pet-post.model.ts
-│           └── user.model.ts
-└── presentation/           # Capa de presentación
-    ├── server.ts           # Configuración del servidor Express
-    ├── routes.ts           # Rutas principales
-    ├── pets/               # Módulo de mascotas
-    │   ├── controller.ts
-    │   ├── routes.ts
-    │   └── services/
-    │       ├── create-pet.service.ts
-    │       ├── finder-pet.service.ts
-    │       ├── update-pet.service.ts
-    │       ├── delete-pet.service.ts
-    │       ├── approved-pet.service.ts
-    │       └── rejected-pet.service.ts
-    └── user/               # Módulo de usuarios
-        ├── controller.ts
-        ├── routes.ts
-        └── services/
-            ├── creator-user.service.ts
-            ├── login-user.service.ts
-            └── finder-user.service.ts
-```
+- Presentación : Controladores, rutas y middlewares
+- Dominio : DTOs y servicios de dominio
+- Datos : Modelos y conexión a base de datos
+- Configuración : Variables de entorno y configuraciones
 
 ## 📝 Endpoints API
-
-### Mascotas
-- `GET /api/petposts` - Obtener todas las mascotas
-- `GET /api/petposts/:id` - Obtener mascota por ID
-- `POST /api/petposts` - Crear nueva mascota
-- `PATCH /api/petposts/:id` - Actualizar mascota
-- `DELETE /api/petposts/:id` - Eliminar mascota
-- `PATCH /api/petposts/:id/approve` - Aprobar publicación
-- `PATCH /api/petposts/:id/reject` - Rechazar publicación
-
 ### Usuarios
-- `POST /api/v1/users/register` - Registrar usuario
-- `POST /api/v1/users/login` - Iniciar sesión
-- `GET /api/v1/users` - Obtener todos los usuarios
-- `GET /api/v1/users/:id` - Obtener usuario por ID
-
-## 🧪 Scripts disponibles
-
-- `npm run dev` - Inicia la aplicación en modo desarrollo con recarga automática
-- `npm run build` - Compila el proyecto TypeScript
-- `npm start` - Compila y ejecuta la aplicación para producción
-
+- POST /api/v1/users/register - Registrar usuario
+- GET /api/v1/users/verify-email/:token - Verificar correo electrónico
+- POST /api/v1/users/login - Iniciar sesión
+### Mascotas (Acceso público)
+- GET /api/v1/pets - Obtener todas las publicaciones aprobadas
+- GET /api/v1/pets/:id - Obtener una publicación específica
+### Mascotas (Requiere autenticación)
+- POST /api/v1/pets - Crear una nueva publicación
+### Mascotas (Solo administradores)
+- PATCH /api/v1/pets/:id - Actualizar una publicación
+- DELETE /api/v1/pets/:id - Eliminar una publicación
+- PATCH /api/v1/pets/:id/approve - Aprobar una publicación
+- PATCH /api/v1/pets/:id/reject - Rechazar una publicación
 ## 📄 Licencia
-ISC
+Este proyecto está bajo la Licencia ISC.
 
 ## 👨‍💻 Autor
 Carlos Quintero
 
----
-
-⭐ ¡No olvides dejar una estrella si te ha sido útil! ⭐
+⭐️ ¡Si te gusta este proyecto, no olvides darle una estrella! ⭐️
