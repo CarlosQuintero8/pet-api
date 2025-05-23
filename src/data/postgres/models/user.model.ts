@@ -1,6 +1,11 @@
 import { BaseEntity, Column, Entity, PrimaryGeneratedColumn, BeforeInsert, BeforeUpdate } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
+export enum UserRole {
+  USER = "user",
+  ADMIN = "admin"
+}
+
 @Entity()
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
@@ -25,6 +30,13 @@ export class User extends BaseEntity {
   })
   password: string;
 
+  @Column({
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.USER
+  })
+  role: UserRole;
+
   @Column('varchar', {
     length: 20,
     nullable: true,
@@ -36,6 +48,18 @@ export class User extends BaseEntity {
     nullable: true,
   })
   address: string;
+
+  @Column('boolean', {
+    default: false,
+    nullable: false,
+  })
+  isEmailVerified: boolean;
+
+  @Column('varchar', {
+    nullable: true,
+    length: 36,
+  })
+  verificationToken: string | null;
 
   @Column('boolean', {
     default: true,
@@ -57,7 +81,8 @@ export class User extends BaseEntity {
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword() {
-    if (this.password) {
+    // Solo hashear si la contraseña ha sido modificada
+    if (this.password && (!this.id || this.password.indexOf('$2b$') !== 0)) {
       const salt = await bcrypt.genSalt(10);
       this.password = await bcrypt.hash(this.password, salt);
     }

@@ -16,16 +16,24 @@
     "@types/bcrypt": "^5.0.2",
     "@types/express": "^4.17.21",
     "@types/node": "^22.15.17",
+    "@types/nodemailer": "^6.4.17",
+    "@types/uuid": "^10.0.0",
     "rimraf": "^6.0.1",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@types/jsonwebtoken": "^9.0.2",
     "bcrypt": "^6.0.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
     "env-var": "^7.5.0",
     "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^7.0.3",
     "pg": "^8.15.6",
     "reflect-metadata": "^0.2.2",
-    "typeorm": "^0.3.23"
+    "typeorm": "^0.3.23",
+    "uuid": "^11.1.0"
   }
 }

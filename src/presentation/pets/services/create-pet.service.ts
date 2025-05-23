@@ -1,22 +1,26 @@
-import { PetPost } from '../../../data';
+import { CreatePetDto } from '../../../domain/dtos/pets/create-pet.dto';
+import { PetResponseDto } from '../../../domain/dtos/pets/pet-response.dto';
+import { PetPost, PetPostStatus } from '../../../data';
+import { plainToClass } from 'class-transformer';
 
 export class CreatorPetService {
-  async execute(data: any) {
-    const pet = new PetPost();
-    pet.pet_name = data.pet_name?.trim().toLowerCase() || '';
-    pet.description = data.description?.trim().toLowerCase() || '';
-    pet.image_url = data.image_url?.trim() || '';
-
-    pet.owner = data.owner || '76872118-50f5-41f9-8a39-1f2ea24df876';
-
+  async execute(dto: CreatePetDto, ownerId: string): Promise<PetResponseDto> {
     try {
+      const pet = new PetPost();
+      pet.pet_name = dto.pet_name.trim().toLowerCase();
+      pet.description = dto.description.trim().toLowerCase();
+      pet.image_url = dto.image_url.trim();
+      pet.status = PetPostStatus.PENDING;
+      pet.owner = ownerId; 
+      pet.hasFound = false;
+      pet.created_at = new Date(); 
+
       await pet.save();
-      return {
-        message: "Pet created successfully",
-      };
-    } catch (error) {
-      console.error("Error creating pet:", error);
-      throw new Error("Failed to create pet");
+
+      return plainToClass(PetResponseDto, pet);
+    } catch (error: any) {
+      console.error('Error creating pet:', error);
+      throw new Error(`No se pudo crear el post de la mascota: ${error.message || 'Error desconocido'}`);
     }
   }
 }

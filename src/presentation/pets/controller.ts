@@ -1,107 +1,117 @@
-import { Request, Response } from "express";
-import { CreatorPetService } from "./services/create-pet.service";
-import { FinderPetService } from "./services/finder-pet.service";
-import { DeletePetService } from "./services/delete-pet.service";
-import { UpdatePetService } from "./services/update-pet.service";
-import { ApprovePetPostService } from "./services/approved-pet.service";
-import { RejectPetPostService } from "./services/rejected-pet.service";
+import { Request, Response } from 'express';
+import { plainToClass } from 'class-transformer';
+import { validate } from 'class-validator';
+import { CreatePetDto, PetResponseDto } from '../../domain/dtos/pets';
+import { UpdatePetPostStatusService } from './services/update-pet-post-status.service';
+import { CreatorPetService } from './services/create-pet.service';
+import { FinderPetService } from './services/finder-pet.service';
+import { DeletePetService } from './services/delete-pet.service';
+import { UpdatePetService } from './services/update-pet.service';
+import { ApprovePetPostService } from './services/approved-pet.service';
+import { RejectPetPostService } from './services/rejected-pet.service';
 
-export class PetController {
+export class PetPostController {
   constructor(
-    private readonly creatorPetService: CreatorPetService,
-    private readonly finderPetService: FinderPetService,
-    private readonly deletePetService: DeletePetService,
-    private readonly updatePetService: UpdatePetService,
-    private readonly approvePetPostService: ApprovePetPostService,
-    private readonly rejectPetPostService: RejectPetPostService
+    private readonly updatePetPostStatusService: UpdatePetPostStatusService = new UpdatePetPostStatusService(),
+    private readonly creatorPetService: CreatorPetService = new CreatorPetService(),
+    private readonly finderPetService: FinderPetService = new FinderPetService(),
+    private readonly deletePetService: DeletePetService = new DeletePetService(new FinderPetService()),
+    private readonly updatePetService: UpdatePetService = new UpdatePetService(new FinderPetService()),
+    private readonly approvePetPostService: ApprovePetPostService = new ApprovePetPostService(new FinderPetService()),
+    private readonly rejectPetPostService: RejectPetPostService = new RejectPetPostService(new FinderPetService())
   ) {}
 
-  createPet = (req: Request, res: Response) => {
-    const data = req.body;
-
-    this.creatorPetService
-      .execute(data)
-      .then((result) => res.status(201).json(result))
-      .catch((error) => res.status(500).json(error));
-  };
-
-  findAllPets = (req: Request, res: Response) => {
-    this.finderPetService
-      .executeByFindAll()
-      .then((result) => res.status(200).json(result))
-      .catch((error) => res.status(500).json(error));
-  };
-
-  findOne = (req: Request, res: Response) => {
-    const { id } = req.params;
-
-    this.finderPetService
-      .executeByFindOne(id)
-      .then((result) => res.status(200).json(result))
-      .catch((error) => res.status(500).json(error));
-  };
-
-  delete = (req: Request, res: Response) => {
-    const { id } = req.params;
-
-    this.deletePetService
-      .execute(id)
-      .then((result) => res.status(200).json(result))
-      .catch((error) => res.status(500).json(error));
-  };
-
-  update = (req: Request, res: Response) => {
-    const { id } = req.params;
-    
-    // Logs mejorados para depuración
-    console.log('=== INICIO DE ACTUALIZACIÓN ===');
-    console.log('ID recibido:', id);
-    console.log('Headers:', JSON.stringify(req.headers));
-    console.log('Content-Type:', req.headers['content-type']);
-    console.log('Body completo:', JSON.stringify(req.body));
-    console.log('Tipo de body:', typeof req.body);
-    
-    // Verificar si el body está vacío
-    if (!req.body || Object.keys(req.body).length === 0) {
-      console.error('Error: Body vacío o inválido');
-      return res.status(400).json({
-        message: 'Error al actualizar la publicación',
-        error: 'No se proporcionaron datos para actualizar'
-      });
+  findAllPets = async (req: Request, res: Response) => {
+    try {
+      const pets = await this.finderPetService.executeByFindAll();
+      return res.status(200).json(pets);
+    } catch (error) {
+      return res.status(500).json({ message: 'Error interno del servidor' });
     }
-    
-    this.updatePetService
-      .execute(id, req.body)
-      .then((result) => {
-        console.log('Actualización exitosa:', result);
-        res.status(200).json(result);
-      })
-      .catch((error) => {
-        console.error('Error en controlador:', error);
-        console.error('Stack de error:', error.stack);
-        res.status(500).json({ 
-          message: 'Error al actualizar la publicación',
-          error: error.message 
-        });
-      });
-    console.log('=== FIN DE SOLICITUD DE ACTUALIZACIÓN ===');
   };
 
-  approve = (req: Request, res: Response) => {
-    const { id } = req.params;
+  createPet = async (req: Request, res: Response) => {
+    try {
+      const createPetDto = plainToClass(CreatePetDto, req.body);
+      const errors = await validate(createPetDto);
+      if (errors.length > 0) {
+        return res.status(400).json({ message: 'Datos inválidos', errors });
+      }
 
-    this.approvePetPostService
-      .execute(id)
-      .then((result) => res.status(200).json(result))
-      .catch((error) => res.status(500).json(error));
+      if (!req.user?.id) {
+        return res.status(401).json({ message: 'Usuario no autenticado' });
+      }
+
+      const result = await this.creatorPetService.execute(createPetDto, req.user.id);
+      return res.status(201).json(result);
+    } catch (error: any) {
+      console.error('Error in createPet:', error);
+      return res.status(500).json({ message: `Error al crear el post: ${error.message || 'Error desconocido'}` });
+    }
   };
 
-  reject = (req: Request, res: Response) => {
+  findOne = async (req: Request, res: Response) => {
     const { id } = req.params;
+    try {
+      const pet = await this.finderPetService.executeByFindOne(id);
+      return res.status(200).json(pet);
+    } catch (error: any) {
+      if (error.message === 'Pet post not found') {
+        return res.status(404).json({ message: 'Post de mascota no encontrado' });
+      }
+      return res.status(500).json({ message: 'Error interno del servidor' });
+    }
+  };
 
-    this.rejectPetPostService
-      .execute(id)
-      .then((result) => res.status(200).json(result))
-      .catch((error) => res.status(500).json(error));
+  update = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    try {
+      const result = await this.updatePetService.execute(id, req.body);
+      return res.status(200).json(result);
+    } catch (error: any) {
+      if (error.message.includes('Pet post not found')) {
+        return res.status(404).json({ message: 'Post de mascota no encontrado' });
+      }
+      return res.status(500).json({ message: 'Error interno del servidor' });
+    }
+  };
+
+  delete = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    try {
+      const result = await this.deletePetService.execute(id);
+      return res.status(200).json(result);
+    } catch (error: any) {
+      if (error.message.includes('Pet post not found')) {
+        return res.status(404).json({ message: 'Post de mascota no encontrado' });
+      }
+      return res.status(500).json({ message: 'Error interno del servidor' });
+    }
+  };
+
+  approvePost = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    try {
+      const result = await this.approvePetPostService.execute(id);
+      return res.status(200).json(result);
+    } catch (error: any) {
+      if (error.message === 'Pet post not found') {
+        return res.status(404).json({ message: 'Post de mascota no encontrado' });
+      }
+      return res.status(500).json({ message: 'Error interno del servidor' });
+    }
+  };
+
+  rejectPost = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    try {
+      const result = await this.rejectPetPostService.execute(id);
+      return res.status(200).json(result);
+    } catch (error: any) {
+      if (error.message === 'Pet post not found') {
+        return res.status(404).json({ message: 'Post de mascota no encontrado' });
+      }
+      return res.status(500).json({ message: 'Error interno del servidor' });
+    }
   };
 }

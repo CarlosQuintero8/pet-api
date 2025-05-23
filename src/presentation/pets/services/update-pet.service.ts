@@ -7,6 +7,12 @@ export class UpdatePetService {
     try {
       const petPost = await this.finderPetService.executeByFindOne(id);
 
+      // Verificar si petPost existe
+      if (!petPost) {
+        throw new Error('Pet post not found');
+      }
+
+      // Actualizar solo los campos proporcionados y válidos
       if (typeof data.pet_name === 'string' && data.pet_name.trim() !== '') {
         petPost.pet_name = data.pet_name.trim().toLowerCase();
       }
