@@ -1,110 +1,80 @@
-# 🐾 API de Mascotas Perdidas
+🐾 Pet API 📖
+Welcome to the Pet API, a RESTful API designed to help users manage pet-related posts (e.g., lost or found pets) and authenticate seamlessly! Built with ❤️ using TypeScript, Node.js, and PostgreSQL, this project aims to connect pet lovers and assist in reuniting pets with their owners. 🚀
 
-## 📋 Descripción
-API RESTful para gestionar publicaciones de mascotas perdidas. Permite a los usuarios registrarse, crear publicaciones sobre sus mascotas perdidas, y a los administradores aprobar o rechazar estas publicaciones.
+✨ Features
+User Authentication 🔑
+Register and verify users and admins.
+Secure login with JWT tokens.
+Pet Post Management 🐶
+Create, view, and manage pet posts (pending, approved, rejected).
+Admin-only actions: approve, reject, modify, or delete posts.
+Scalable & Maintainable ⚙️
+TypeORM for database synchronization and migrations.
+Clean architecture with DTOs and services.
+API Documentation 📚
+Comprehensive Postman collection with detailed endpoints.
+🛠️ Installation
+Follow these steps to set up the project locally:
 
-## 🚀 Características
-- ✅ Gestión completa de publicaciones de mascotas (CRUD)
-- 👤 Sistema de usuarios con registro y autenticación
-- 🔍 Búsqueda de mascotas por ID
-- 👮 Flujo de aprobación/rechazo de publicaciones
-- 🔒 Arquitectura orientada a servicios
+Clone the Repository
+bash
 
-## 🛠️ Tecnologías
-- [Node.js](https://nodejs.org/)
-- [Express](https://expressjs.com/)
-- [TypeScript](https://www.typescriptlang.org/)
-- [PostgreSQL](https://www.postgresql.org/)
-- [TypeORM](https://typeorm.io/)
-
-## 📦 Instalación
-
-1. Clonar el repositorio:
-```bash
-git clone https://github.com/CarlosQuintero8/pet-api.git
+Copy
+git clone https://github.com/your-username/pet-api.git
 cd pet-api
-```
+Install Dependencies
+bash
 
-2. Instalar dependencias:
-```bash
+Copy
 npm install
-```
+Set Up Environment Variables
+Create a .env file in the root directory and add the following:
+text
 
-3. Configurar variables de entorno:
-Crea un archivo `.env` en la raíz del proyecto con las siguientes variables:
-```
+Copy
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+DB_DATABASE=pet_api_db
+JWT_SECRET=your_jwt_secret_key
 PORT=3000
-NODE_ENV=development
-DATABASE_USERNAME=tu_usuario
-DATABASE_PASSWORD=tu_contraseña
-DATABASE_HOST=localhost
-DATABASE_PORT=5432
-DATABASE_NAME=pet_api_db
-```
+Set Up the Database
+Ensure PostgreSQL is running.
+Run the following to create the database:
+sql
 
-4. Iniciar la aplicación en modo desarrollo:
-```bash
+Copy
+CREATE DATABASE pet_api_db;
+Apply migrations (if configured):
+bash
+
+Copy
+npx typeorm migration:run -d src/data-source.ts
+Run the Project
+bash
+
+Copy
 npm run dev
-```
+🚀 Usage
+API Endpoints
+The API is accessible at http://localhost:3000/api/v1. Below are some key endpoints:
 
-## 🏗️ Estructura del Proyecto
+Register User: POST /auth/register/user
+Login User: POST /auth/login/user
+Create Pet Post: POST /pets (requires authentication)
+Approve Pet Post: PATCH /pets/:petId/approve (admin-only)
+For a complete list of endpoints, refer to the API Documentation.
 
-```
-src/
-├── app.ts                  # Punto de entrada de la aplicación
-├── config/                 # Configuración de la aplicación
-├── data/                   # Capa de datos y modelos
-│   └── postgres/
-│       └── models/
-│           ├── pet-post.model.ts
-│           └── user.model.ts
-└── presentation/           # Capa de presentación
-    ├── server.ts           # Configuración del servidor Express
-    ├── routes.ts           # Rutas principales
-    ├── pets/               # Módulo de mascotas
-    │   ├── controller.ts
-    │   ├── routes.ts
-    │   └── services/
-    │       ├── create-pet.service.ts
-    │       ├── finder-pet.service.ts
-    │       ├── update-pet.service.ts
-    │       ├── delete-pet.service.ts
-    │       ├── approved-pet.service.ts
-    │       └── rejected-pet.service.ts
-    └── user/               # Módulo de usuarios
-        ├── controller.ts
-        ├── routes.ts
-        └── services/
-            ├── creator-user.service.ts
-            ├── login-user.service.ts
-            └── finder-user.service.ts
-```
+Testing
+Use Postman to test the API. Import the Pet API Tests collection and set up the environment variables (e.g., {{userToken}}, {{adminToken}}).
 
-## 📝 Endpoints API
+📚 API Documentation
+Check out the interactive API documentation published on Postman:
 
-### Mascotas
-- `GET /api/petposts` - Obtener todas las mascotas
-- `GET /api/petposts/:id` - Obtener mascota por ID
-- `POST /api/petposts` - Crear nueva mascota
-- `PATCH /api/petposts/:id` - Actualizar mascota
-- `DELETE /api/petposts/:id` - Eliminar mascota
-- `PATCH /api/petposts/:id/approve` - Aprobar publicación
-- `PATCH /api/petposts/:id/reject` - Rechazar publicación
-
-### Usuarios
-- `POST /api/v1/users/register` - Registrar usuario
-- `POST /api/v1/users/login` - Iniciar sesión
-- `GET /api/v1/users` - Obtener todos los usuarios
-- `GET /api/v1/users/:id` - Obtener usuario por ID
-
-## 🧪 Scripts disponibles
-
-- `npm run dev` - Inicia la aplicación en modo desarrollo con recarga automática
-- `npm run build` - Compila el proyecto TypeScript
-- `npm start` - Compila y ejecuta la aplicación para producción
-
-## 📄 Licencia
-ISC
+URL: Pet API Docs (Replace with your published URL)
+Includes detailed descriptions, request examples, and response schemas for all endpoints.
+To view or contribute to the documentation, ensure you have access to the Postman workspace.
 
 ## 👨‍💻 Autor
 Carlos Quintero
