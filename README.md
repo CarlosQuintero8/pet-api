@@ -33,10 +33,6 @@ El proyecto sigue una arquitectura en capas:
 - Dominio : DTOs y servicios de dominio
 - Datos : Modelos y conexión a base de datos
 - Configuración : Variables de entorno y configuraciones
-## 🚀 Instalación y Uso
-### Requisitos previos
-- Node.js (v14 o superior)
-- PostgreSQL
 
 ## 📝 Endpoints API
 ### Usuarios
